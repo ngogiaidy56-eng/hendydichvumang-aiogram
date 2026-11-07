@@ -2,14 +2,17 @@
 from __future__ import annotations
 
 import json
+import logging
 from html import escape
+from pathlib import Path
 from typing import Any
 
 from aiogram import F, Router
+from aiogram.exceptions import TelegramAPIError
 from aiogram.filters import Command, CommandStart
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, FSInputFile, Message
 
-from bot.keyboards.inline import proxy_keyboard
+from bot.keyboards.inline import main_menu_keyboard, proxy_keyboard
 from config import Settings
 from database import JsonDatabase
 from services.proxy_service import ProxyService, ProxyServiceError
@@ -29,6 +32,12 @@ HELP_TEXT = (
     "Các thao tác kết nối chỉ hoạt động khi quản trị viên cấu hình API HomeProxy Hub chính xác."
 )
 
+HOME_CAPTION = (
+    "<b>HENDY BOT — HENDY CYBERTECH</b>\n"
+    "Công nghệ kết nối — Giá trị thật!\n\n"
+    "Chọn một dịch vụ bên dưới để bắt đầu."
+)
+
 
 def _format_result(value: Any) -> str:
     try:
@@ -36,6 +45,15 @@ def _format_result(value: Any) -> str:
     except (TypeError, ValueError):
         rendered = str(value)
     return f"<pre>{escape(rendered[:2500])}</pre>"
+
+
+def _resolve_home_photo(photo_setting: str) -> str | FSInputFile:
+    """Accept Telegram file_id, HTTPS URL, or an existing local file path."""
+    value = photo_setting.strip()
+    local_path = Path(value).expanduser()
+    if local_path.is_file():
+        return FSInputFile(local_path)
+    return value
 
 
 async def _track(database: JsonDatabase, user: Any, action: str) -> None:
@@ -47,12 +65,20 @@ async def _track(database: JsonDatabase, user: Any, action: str) -> None:
 async def start_handler(message: Message, database: JsonDatabase, settings: Settings) -> None:
     if message.from_user:
         await _track(database, message.from_user, "start")
-    await message.answer(
-        "<b>Hendy Dịch Vụ Mạng</b>\n\n"
-        "Bot quản lý kết nối proxy và tài khoản HomeProxy Hub.\n"
-        "Chọn thao tác bên dưới hoặc dùng /help để xem hướng dẫn.",
-        reply_markup=proxy_keyboard(settings.mini_app_url),
-    )
+    keyboard = main_menu_keyboard(settings)
+
+    if settings.bot_home_photo:
+        try:
+            await message.answer_photo(
+                photo=_resolve_home_photo(settings.bot_home_photo),
+                caption=HOME_CAPTION,
+                reply_markup=keyboard,
+            )
+            return
+        except (TelegramAPIError, OSError, ValueError) as exc:
+            logging.warning("BOT_HOME_PHOTO could not be sent (%s); falling back to text menu.", type(exc).__name__)
+
+    await message.answer(HOME_CAPTION, reply_markup=keyboard)
 
 
 @router.message(Command("help"))
@@ -97,7 +123,7 @@ async def proxy_handler(message: Message, database: JsonDatabase, settings: Sett
     if message.from_user:
         await _track(database, message.from_user, "proxy_menu")
     await message.answer(
-        "<b>Điều khiển Proxy</b>\nChọn một thao tác:",
+        "<b>Điều khiển OTP & Proxy</b>\nChọn một thao tác:",
         reply_markup=proxy_keyboard(settings.mini_app_url),
     )
 
