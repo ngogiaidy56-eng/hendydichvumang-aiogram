@@ -5,6 +5,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from bot.handlers.admin import router as admin_router
+from bot.handlers.menu import router as menu_router
 from bot.handlers.proxy import router as proxy_router
 from config import Settings
 
@@ -15,6 +16,7 @@ def create_bot_dispatcher(settings: Settings) -> tuple[Bot, Dispatcher]:
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
     dispatcher = Dispatcher(storage=MemoryStorage())
+    dispatcher.include_router(menu_router)
     dispatcher.include_router(proxy_router)
     dispatcher.include_router(admin_router)
     return bot, dispatcher

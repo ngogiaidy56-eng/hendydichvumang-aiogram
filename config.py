@@ -43,6 +43,16 @@ def _validate_base_url(raw: str) -> str:
     return value
 
 
+def _optional_https_url(name: str) -> str:
+    value = os.getenv(name, "").strip()
+    if not value:
+        return ""
+    parsed = urlparse(value)
+    if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password:
+        raise ConfigurationError(f"{name} phải là URL HTTPS công khai hợp lệ.")
+    return value
+
+
 @dataclass(frozen=True, slots=True)
 class Settings:
     bot_token: str
@@ -59,6 +69,10 @@ class Settings:
     host: str
     port: int
     log_level: str
+    bot_home_photo: str = ""
+    bot_minigame_url: str = ""
+    bot_group_chat_url: str = ""
+    bot_support_url: str = ""
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -102,6 +116,10 @@ class Settings:
             host=os.getenv("HOST", "0.0.0.0").strip() or "0.0.0.0",
             port=port,
             log_level=os.getenv("LOG_LEVEL", "INFO").upper().strip(),
+            bot_home_photo=os.getenv("BOT_HOME_PHOTO", "").strip(),
+            bot_minigame_url=_optional_https_url("BOT_MINIGAME_URL"),
+            bot_group_chat_url=_optional_https_url("BOT_GROUP_CHAT_URL"),
+            bot_support_url=_optional_https_url("BOT_SUPPORT_URL"),
         )
 
     @property

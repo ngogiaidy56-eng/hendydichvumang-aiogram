@@ -50,6 +50,7 @@ async def _set_commands(bot) -> None:
         BotCommand(command="me", description="Xem thông tin tài khoản"),
         BotCommand(command="id", description="Hiển thị Telegram ID"),
         BotCommand(command="admin", description="Bảng quản trị (admin)"),
+        BotCommand(command="photoid", description="Lấy file_id ảnh trang chủ (admin)"),
         BotCommand(command="users", description="Danh sách người dùng (admin)"),
         BotCommand(command="user", description="Tra cứu Telegram ID (admin)"),
         BotCommand(command="events", description="Lịch sử hoạt động (admin)"),
