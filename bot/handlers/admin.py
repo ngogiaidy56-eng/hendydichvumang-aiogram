@@ -53,6 +53,23 @@ async def admin_panel(message: Message, database: JsonDatabase, settings: Settin
     )
 
 
+@router.message(Command("photoid"))
+async def photo_id_command(message: Message, settings: Settings) -> None:
+    """Return a photo file_id so an admin can set BOT_HOME_PHOTO on Render."""
+    if not _require_admin(message, settings):
+        await message.answer("Bạn không có quyền sử dụng lệnh quản trị.")
+        return
+    replied = message.reply_to_message
+    if not replied or not replied.photo:
+        await message.answer("Hãy trả lời (Reply) vào một ảnh đã gửi cho bot bằng lệnh /photoid.")
+        return
+    file_id = replied.photo[-1].file_id
+    await message.answer(
+        "Đặt giá trị này trong Render Environment:\n"
+        f"<code>BOT_HOME_PHOTO={escape(file_id)}</code>"
+    )
+
+
 @router.message(Command("users"))
 async def users_command(message: Message, database: JsonDatabase, settings: Settings) -> None:
     if not _require_admin(message, settings):
