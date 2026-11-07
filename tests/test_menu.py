@@ -27,11 +27,10 @@ class MainMenuTests(unittest.TestCase):
         values.update(overrides)
         return Settings(**values)
 
-    def test_menu_contains_all_eleven_requested_buttons(self) -> None:
+    def test_menu_contains_all_eleven_buttons_in_requested_order(self) -> None:
         keyboard = main_menu_keyboard(self.make_settings())
         labels = [button.text for row in keyboard.inline_keyboard for button in row]
-        self.assertEqual(len(labels), 11)
-        for label in (
+        self.assertEqual(labels, [
             "🚀 MINIGAME LIVE",
             "📲 OTP & PROXY",
             "💠 TRUNG TÂM KHÁCH HÀNG",
@@ -43,8 +42,7 @@ class MainMenuTests(unittest.TestCase):
             "🎁 CODE MÀN - CODE TELE",
             "👑 TRUNG TÂM VIP",
             "🎟️ NHẬP GIFTCODE",
-        ):
-            self.assertIn(label, labels)
+        ])
 
     def test_optional_links_become_url_buttons(self) -> None:
         settings = self.make_settings(
