@@ -14,6 +14,14 @@ services:
         sync: false
       - key: MINI_APP_URL
         value: ""
+      - key: BOT_HOME_PHOTO
+        sync: false
+      - key: BOT_MINIGAME_URL
+        value: ""
+      - key: BOT_GROUP_CHAT_URL
+        value: ""
+      - key: BOT_SUPPORT_URL
+        value: ""
       - key: DATABASE_PATH
         value: database.json
       - key: HOME_PROXY_HUB_API_URL
