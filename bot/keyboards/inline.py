@@ -5,7 +5,7 @@ from config import Settings
 
 
 def main_menu_keyboard(settings: Settings) -> InlineKeyboardMarkup:
-    """Build the 11-item customer menu in two-column mobile-friendly rows."""
+    """Build the 11 requested customer buttons in the order supplied."""
     minigame_button = (
         InlineKeyboardButton(text="🚀 MINIGAME LIVE", url=settings.bot_minigame_url)
         if settings.bot_minigame_url
@@ -34,15 +34,13 @@ def main_menu_keyboard(settings: Settings) -> InlineKeyboardMarkup:
             InlineKeyboardButton(text="👑 DỊCH VỤ SẮP TRIỂN KHAI", callback_data="menu:upcoming"),
             InlineKeyboardButton(text="👑 KHO CÔNG CỤ TOOLS ĐỘC QUYỀN", callback_data="menu:tools"),
         ],
-        [
-            InlineKeyboardButton(text="💳 NẠP TIỀN", callback_data="menu:deposit"),
-            InlineKeyboardButton(text="🎁 CODE MÀN - CODE TELE", callback_data="menu:codes"),
-        ],
-        [
-            InlineKeyboardButton(text="👑 TRUNG TÂM VIP", callback_data="menu:vip"),
-            InlineKeyboardButton(text="🎟️ NHẬP GIFTCODE", callback_data="menu:giftcode"),
-        ],
+        [InlineKeyboardButton(text="💳 NẠP TIỀN", callback_data="menu:deposit")],
         [group_button, support_button],
+        [
+            InlineKeyboardButton(text="🎁 CODE MÀN - CODE TELE", callback_data="menu:codes"),
+            InlineKeyboardButton(text="👑 TRUNG TÂM VIP", callback_data="menu:vip"),
+        ],
+        [InlineKeyboardButton(text="🎟️ NHẬP GIFTCODE", callback_data="menu:giftcode")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
