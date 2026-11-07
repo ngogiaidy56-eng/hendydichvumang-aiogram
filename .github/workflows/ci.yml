@@ -9,34 +9,30 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: python-ci-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  quality:
-    name: Python ${{ matrix.python-version }}
+  test:
+    name: Python ${{ matrix.python_version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.13"]
+        python_version: ["3.12", "3.13"]
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: pip
-          cache-dependency-path: requirements*.txt
+          python-version: ${{ matrix.python_version }}
       - name: Install dependencies
-        run: python -m pip install --upgrade pip && pip install -r requirements-dev.txt
-      - name: Check static errors
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Run Ruff
         run: ruff check .
       - name: Compile source
         run: python -m compileall -q .
       - name: Import application modules
-        run: python -c "import main; from bot.loader import create_bot_dispatcher; print('application imports: ok')"
+        run: python -c "import main; import bot.loader; print('application imports: ok')"
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
